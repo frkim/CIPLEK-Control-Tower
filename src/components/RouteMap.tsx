@@ -337,9 +337,12 @@ export default function RouteMap({
               const [x, y] = project(route.originCoordinates)
               const selected = selectedRoute === route.id
               const affected = disrupted && AFFECTED_ROUTES.has(route.id)
-              const crowded = route.id === 'ningbo'
               const labelX = route.id === 'hochi' ? x - 12 : x + 12
-              const labelY = crowded ? y + 15 : y - 9
+              const labelOffsetY = route.id === 'shanghai' ? -18
+                : route.id === 'ningbo' ? 2
+                : route.id === 'shenzhen' ? 9
+                : route.id === 'singapore' ? 5 : -9
+              const labelY = y + labelOffsetY
               return (
                 <g
                   key={`port-${route.id}`}

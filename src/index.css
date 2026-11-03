@@ -2,36 +2,69 @@
 
 :root {
   font-family: "Inter", "Segoe UI", -apple-system, BlinkMacSystemFont, sans-serif;
-  color: #23332f;
-  background: #f5f7f6;
+  font-size: 16px;
+  line-height: 1.5;
+  color: var(--text);
+  background: var(--background);
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  --background: #f5f7f6;
-  --card: #ffffff;
-  --text: #23332f;
-  --text-secondary: #61716b;
-  --text-muted: #68756c;
-  --border: #e8ece9;
-  --subtle: #f8faf9;
-  --teal: #087c6a;
-  --teal-pale: #e9f5ef;
-  --chart-grid: #edf0ed;
+  --color-brand-blue: #004B87;
+  --color-brand-green: #00A651;
+  --color-brand-orange: #F58220;
+  --color-brand-navy: #00345B;
+  --color-brand-green-light: #7BCB9B;
+  --color-energy: #0077B8;
+  --color-products: #70A943;
+  --color-surface: #FFFFFF;
+  --color-surface-blue: #E6F1F8;
+  --color-surface-green: #E8F5ED;
+  --color-surface-muted: #F3F5F7;
+  --color-text-primary: #344454;
+  --color-text-secondary: #84919D;
+  --background: var(--color-surface-muted);
+  --card: var(--color-surface);
+  --text: var(--color-text-primary);
+  /* The palette's medium grey and vivid green need darker text variants on white. */
+  --text-secondary: #526575;
+  --text-muted: #5B6C7A;
+  --border: #D7E1E9;
+  --subtle: var(--color-surface-muted);
+  --primary: var(--color-brand-blue);
+  --primary-pale: var(--color-surface-blue);
+  --positive: #00783B;
+  --positive-pale: var(--color-surface-green);
+  --warning: #994500;
+  --warning-pale: #FFF2E6;
+  --heading: var(--color-brand-navy);
+  --chart-grid: #D7E1E9;
+  --shadow: 0 2px 8px color-mix(in srgb, var(--color-brand-navy) 5%, transparent);
+  --on-brand: var(--color-surface);
+  --button-primary: var(--color-brand-blue);
+  --button-positive: #00783B;
+  --control-border: #7C8E9D;
 }
 
 :root[data-theme='dark'] {
   color-scheme: dark;
-  --background: #111b1b;
-  --card: #192525;
-  --text: #e3ebe6;
-  --text-secondary: #abb9b0;
-  --text-muted: #94a69e;
-  --border: #2b3a36;
-  --subtle: #1d2c28;
-  --teal: #6ed6b9;
-  --teal-pale: #1e3c33;
-  --chart-grid: #2b3a36;
+  --background: #0B1D2D;
+  --card: #122C42;
+  --text: #E6F1F8;
+  --text-secondary: #C0CFDA;
+  --text-muted: #A7BBCB;
+  --border: #38536A;
+  --subtle: #19364D;
+  --primary: #8BC9F4;
+  --primary-pale: #193D59;
+  --positive: var(--color-brand-green-light);
+  --positive-pale: #173F34;
+  --warning: #FFB575;
+  --warning-pale: #493321;
+  --heading: var(--color-surface-blue);
+  --chart-grid: #38536A;
+  --shadow: 0 2px 8px #00000020;
+  --control-border: #829BAE;
 }
 
 * { box-sizing: border-box; }
@@ -42,12 +75,12 @@ button { cursor: pointer; }
 button:disabled { cursor: not-allowed; }
 a { color: inherit; text-decoration: none; }
 button, input, select { outline-offset: 4px; }
-:focus-visible { outline: 2px solid #159c88; outline-offset: 4px; }
+:focus-visible { outline: 3px solid var(--primary); outline-offset: 4px; }
 button { color: inherit; }
 button, select { touch-action: manipulation; }
-::selection { color: #064e42; background: #b7ecda; }
+::selection { color: var(--heading); background: var(--primary-pale); }
 .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
-.skip-link { position: fixed; top: -60px; left: 20px; z-index: 100; padding: 12px; background: var(--card); border: 2px solid var(--teal); border-radius: 6px; }
+.skip-link { position: fixed; top: -80px; left: 20px; z-index: 100; padding: 12px; background: var(--card); border: 2px solid var(--primary); border-radius: 6px; }
 .skip-link:focus { top: 10px; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
