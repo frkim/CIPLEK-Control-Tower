@@ -16,7 +16,7 @@ test('project metadata and documentation use CIPLEK branding', () => {
   const html = read('../index.html')
   assert.ok(html.includes('<title>CIPLEK · Supply Chain Control Tower</title>'))
   assert.ok(html.includes('name="description" content="CIPLEK Supply Chain Control Tower.'))
-  const readme = read('../README.md')
+  const readme = read('../README.md').replace(/\r\n/g, '\n')
   assert.ok(readme.startsWith('# CIPLEK · Supply Chain Control Tower\n'))
   assert.ok(readme.includes('supply chain workspace for CIPLEK.'))
 })
