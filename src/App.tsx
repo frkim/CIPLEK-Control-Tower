@@ -123,7 +123,7 @@ function App() {
   useEffect(() => {
     const media = window.matchMedia('(prefers-color-scheme: dark)')
     const followSystem = () => {
-      try { if (localStorage.getItem('siplec-theme')) return } catch { /* Storage may be unavailable. */ }
+      try { if (localStorage.getItem('ciplek-theme')) return } catch { /* Storage may be unavailable. */ }
       const next = media.matches ? 'dark' : 'light'
       document.documentElement.dataset.theme = next
       setTheme(next)
@@ -176,7 +176,7 @@ function App() {
     const next = theme === 'light' ? 'dark' : 'light'
     setTheme(next)
     document.documentElement.dataset.theme = next
-    try { localStorage.setItem('siplec-theme', next) } catch { /* The theme still works without storage. */ }
+    try { localStorage.setItem('ciplek-theme', next) } catch { /* The theme still works without storage. */ }
   }
   const resetFilters = () => {
     setSearch(''); setQuery(''); setStatus('All statuses'); setMode('All modes'); setSelectedRoute(null); setPage(1)
@@ -198,7 +198,7 @@ function App() {
     }).join(',')).join('\r\n')
     const url = URL.createObjectURL(new Blob(['\uFEFF', csv], { type: 'text/csv;charset=utf-8;' }))
     const anchor = document.createElement('a')
-    anchor.href = url; anchor.download = `siplec-${disrupted ? 'simulation' : 'shipments'}-2026-11.csv`; anchor.click()
+    anchor.href = url; anchor.download = `ciplek-${disrupted ? 'simulation' : 'shipments'}-2026-11.csv`; anchor.click()
     window.setTimeout(() => URL.revokeObjectURL(url), 1000)
     setToast(`${filtered.length} synthetic shipments exported to CSV.`)
   }
@@ -222,9 +222,9 @@ function App() {
       {mobileOpen && <button className="sidebar-backdrop" aria-label="Close navigation" onClick={() => setMobileOpen(false)} />}
       <aside ref={sidebarRef} className={`sidebar ${mobileOpen ? 'is-open' : ''}`} aria-label="Main navigation" role={isMobile && mobileOpen ? 'dialog' : undefined} aria-modal={isMobile && mobileOpen ? true : undefined} inert={isMobile && !mobileOpen}>
         <button className="icon-button sidebar-close" aria-label="Close navigation" onClick={() => { setMobileOpen(false); menuRef.current?.focus() }}><X size={19} /></button>
-        <a href="#" className="brand" aria-label="SIPLEC Control Tower home" onClick={(event) => { event.preventDefault(); changeView('Overview') }}>
+        <a href="#" className="brand" aria-label="CIPLEK Control Tower home" onClick={(event) => { event.preventDefault(); changeView('Overview') }}>
           <span className="brand-symbol"><Box size={25} strokeWidth={1.7} /></span>
-          <span>SIPLEC<span className="brand-subtitle">CONTROL TOWER</span></span>
+          <span>CIPLEK<span className="brand-subtitle">CONTROL TOWER</span></span>
           <span className="brand-dot" />
         </a>
         <div className="workspace"><span className="workspace-icon"><Globe2 size={18} /></span><span>Global operations<small>Supply chain workspace</small></span><ChevronDown size={14} /></div>
@@ -341,13 +341,13 @@ function App() {
             return <div key={route.id}><span className="analytics-route-icon"><Ship size={18} /></span><strong>{route.origin}<small>{route.destination}, France</small></strong><span>{routeMetrics.activeShipments}<small>active shipments</small></span><span>{routeMetrics.delayedDeliveries}<small>delayed</small></span><span className="route-rate">{routeMetrics.onTimeRate}%<small>on time</small></span></div>
           })}</div></section>}
 
-          <footer className="page-footer"><span><span className="footer-mark"><Box size={13} /></span>SIPLEC Control Tower<span className="footer-separator">/</span>Built for a connected world.</span><span><span className="status-light" />All data is synthetic<span className="footer-separator">·</span>November 2026</span></footer>
+          <footer className="page-footer"><span><span className="footer-mark"><Box size={13} /></span>CIPLEK Control Tower<span className="footer-separator">/</span>Built for a connected world.</span><span><span className="status-light" />All data is synthetic<span className="footer-separator">·</span>November 2026</span></footer>
         </main>
       </div>
       <div className={`toast ${toast ? 'visible' : ''}`} role="status">{toast && <><Check size={17} /><span>{toast}</span><button aria-label="Dismiss notification" onClick={() => setToast('')}><X size={15} /></button></>}</div>
       <dialog ref={dialogRef} className="detail-dialog" aria-labelledby="dialog-heading" onCancel={() => { setDetail(null); setHelpOpen(false) }} onClick={(e) => { if (e.target === e.currentTarget) { setDetail(null); setHelpOpen(false) } }}>
         <button className="icon-button dialog-close" aria-label="Close dialog" onClick={() => { setDetail(null); setHelpOpen(false) }}><X size={20} /></button>
-        {detail ? <><span className="dialog-symbol"><Package size={26} /></span><div className="eyebrow">SHIPMENT DETAILS</div><h2 id="dialog-heading">{detail.id}</h2><p className="dialog-subtitle">{detail.cargo}</p><div className="detail-route"><span><small>ORIGIN</small><strong>{detail.origin}</strong>{detail.originCountry}</span><ArrowRight size={24} /><span><small>DESTINATION</small><strong>{detail.destination}</strong>{detail.destinationCountry}</span></div><dl className="detail-grid"><div><dt>Status</dt><dd><span className={`shipment-status ${statusClass[detail.status]}`}><i />{detail.status}</span></dd></div><div><dt>Transport</dt><dd>{detail.mode}</dd></div><div><dt>Estimated arrival</dt><dd>{formatEta(detail.eta)}</dd></div><div><dt>Delay</dt><dd>{detail.delayDays} days</dd></div><div><dt>Containers</dt><dd>{detail.containers} TEU</dd></div><div><dt>Shipment value</dt><dd>{formatCurrency(detail.value)}</dd></div></dl><p className="dialog-note"><CircleHelp size={14} />Synthetic shipment. No live tracking or personal data.</p></> : helpOpen ? <><span className="dialog-symbol"><Globe2 size={27} /></span><div className="eyebrow">WELCOME ABOARD</div><h2 id="dialog-heading">Your world, connected.</h2><p className="dialog-subtitle">A decision-making workspace for SIPLEC's supply chain.</p><ul className="help-steps"><li><Globe2 size={20} /><span><strong>Explore your network</strong>Click map routes to filter shipments. Zoom in for a closer look.</span></li><li><Search size={20} /><span><strong>Find every shipment</strong>Search ports and cargo, filter status, or sort table columns.</span></li><li><FlaskConical size={20} /><span><strong>Test your resilience</strong>Simulate a Suez disruption, then compare and apply three alternatives. Reset anytime.</span></li></ul><p className="dialog-note"><CircleHelp size={14} />Entirely synthetic data. No backend, API keys, or real authorization.</p><button className="button button-teal" onClick={() => setHelpOpen(false)}>Let's explore <ArrowRight size={16} /></button></> : null}
+        {detail ? <><span className="dialog-symbol"><Package size={26} /></span><div className="eyebrow">SHIPMENT DETAILS</div><h2 id="dialog-heading">{detail.id}</h2><p className="dialog-subtitle">{detail.cargo}</p><div className="detail-route"><span><small>ORIGIN</small><strong>{detail.origin}</strong>{detail.originCountry}</span><ArrowRight size={24} /><span><small>DESTINATION</small><strong>{detail.destination}</strong>{detail.destinationCountry}</span></div><dl className="detail-grid"><div><dt>Status</dt><dd><span className={`shipment-status ${statusClass[detail.status]}`}><i />{detail.status}</span></dd></div><div><dt>Transport</dt><dd>{detail.mode}</dd></div><div><dt>Estimated arrival</dt><dd>{formatEta(detail.eta)}</dd></div><div><dt>Delay</dt><dd>{detail.delayDays} days</dd></div><div><dt>Containers</dt><dd>{detail.containers} TEU</dd></div><div><dt>Shipment value</dt><dd>{formatCurrency(detail.value)}</dd></div></dl><p className="dialog-note"><CircleHelp size={14} />Synthetic shipment. No live tracking or personal data.</p></> : helpOpen ? <><span className="dialog-symbol"><Globe2 size={27} /></span><div className="eyebrow">WELCOME ABOARD</div><h2 id="dialog-heading">Your world, connected.</h2><p className="dialog-subtitle">A decision-making workspace for CIPLEK's supply chain.</p><ul className="help-steps"><li><Globe2 size={20} /><span><strong>Explore your network</strong>Click map routes to filter shipments. Zoom in for a closer look.</span></li><li><Search size={20} /><span><strong>Find every shipment</strong>Search ports and cargo, filter status, or sort table columns.</span></li><li><FlaskConical size={20} /><span><strong>Test your resilience</strong>Simulate a Suez disruption, then compare and apply three alternatives. Reset anytime.</span></li></ul><p className="dialog-note"><CircleHelp size={14} />Entirely synthetic data. No backend, API keys, or real authorization.</p><button className="button button-teal" onClick={() => setHelpOpen(false)}>Let's explore <ArrowRight size={16} /></button></> : null}
       </dialog>
     </div>
   )

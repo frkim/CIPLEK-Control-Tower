@@ -201,7 +201,7 @@ export default function RouteMap({
           }
         }}
       >
-        <title id={`${instanceId}-title`}>SIPLEC global supply network</title>
+        <title id={`${instanceId}-title`}>CIPLEK global supply network</title>
         <desc id={`${instanceId}-description`}>
           World map showing {routes.length} shipping routes from Asia to France.
           Select a route or origin port with Enter or Space to filter shipments.
