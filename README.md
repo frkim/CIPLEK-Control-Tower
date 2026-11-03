@@ -29,6 +29,7 @@ Deploy the generated `dist/` directory to a static web host. Configure HTTPS and
 - **Analytics:** change chart periods and compare current route-level performance.
 - **Scenarios:** simulate a Suez Canal disruption and compare Cape of Good Hope, priority air freight, and Eurasian rail alternatives. Applying an alternative updates ETAs, delays, KPIs, and the map. Reset restores the exact original portfolio.
 - **Theme:** the light/dark toggle follows the OS initially, then saves an explicit preference locally. The app remains usable when browser storage is blocked.
+- **Language:** French is the default. Use the 🇫🇷 Français / 🇬🇧 English selector in the top-right header, beside the sun/moon theme toggle. Your choice is saved locally; switching languages preserves simulations and filters. Labels, dates, currency, search terms, and CSV reports follow the selected language.
 
 ## Simulation assumptions
 
