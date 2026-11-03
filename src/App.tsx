@@ -76,6 +76,7 @@ function App() {
   const dialogRef = useRef<HTMLDialogElement>(null)
   const sidebarRef = useRef<HTMLElement>(null)
   const menuRef = useRef<HTMLButtonElement>(null)
+  const drawerWasOpen = useRef(false)
 
   useEffect(() => {
     const media = window.matchMedia('(max-width: 700px)')
@@ -84,7 +85,14 @@ function App() {
     return () => media.removeEventListener('change', update)
   }, [])
   useEffect(() => {
-    if (!mobileOpen || !isMobile) return
+    if (!mobileOpen || !isMobile) {
+      if (drawerWasOpen.current) menuRef.current?.focus()
+      drawerWasOpen.current = false
+      return
+    }
+    drawerWasOpen.current = true
+    const previousOverflow = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
     sidebarRef.current?.querySelector<HTMLButtonElement>('.sidebar-close')?.focus()
     const handleKey = (event: KeyboardEvent) => {
       if (event.key === 'Escape') { setMobileOpen(false); menuRef.current?.focus() }
@@ -97,7 +105,10 @@ function App() {
       if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus() }
     }
     document.addEventListener('keydown', handleKey)
-    return () => document.removeEventListener('keydown', handleKey)
+    return () => {
+      document.removeEventListener('keydown', handleKey)
+      document.body.style.overflow = previousOverflow
+    }
   }, [mobileOpen, isMobile])
 
   useEffect(() => {
@@ -209,7 +220,7 @@ function App() {
     <div className="app-shell">
       <a className="skip-link" href="#main-content">Skip to main content</a>
       {mobileOpen && <button className="sidebar-backdrop" aria-label="Close navigation" onClick={() => setMobileOpen(false)} />}
-      <aside ref={sidebarRef} className={`sidebar ${mobileOpen ? 'is-open' : ''}`} aria-label="Main navigation" inert={isMobile && !mobileOpen}>
+      <aside ref={sidebarRef} className={`sidebar ${mobileOpen ? 'is-open' : ''}`} aria-label="Main navigation" role={isMobile && mobileOpen ? 'dialog' : undefined} aria-modal={isMobile && mobileOpen ? true : undefined} inert={isMobile && !mobileOpen}>
         <button className="icon-button sidebar-close" aria-label="Close navigation" onClick={() => { setMobileOpen(false); menuRef.current?.focus() }}><X size={19} /></button>
         <a href="#" className="brand" aria-label="SIPLEC Control Tower home" onClick={(event) => { event.preventDefault(); changeView('Overview') }}>
           <span className="brand-symbol"><Box size={25} strokeWidth={1.7} /></span>
@@ -233,7 +244,7 @@ function App() {
         </div>
       </aside>
 
-      <div className="main-shell">
+      <div className="main-shell" inert={isMobile && mobileOpen}>
         <header className="topbar">
           <div className="breadcrumb"><button ref={menuRef} className="icon-button mobile-menu" aria-label="Open navigation" aria-expanded={mobileOpen} onClick={() => setMobileOpen(true)}><Menu size={21} /></button><span>Workspace</span><ChevronRight size={14} /><strong>{view}</strong></div>
           <div className="topbar-actions"><span className="demo-label"><span />Synthetic data · Demo environment</span><span className="topbar-divider" /><button className="icon-button" onClick={toggleTheme} aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}>{theme === 'light' ? <Moon size={18} /> : <Sun size={18} />}</button><div className="notification-wrap"><button className={`icon-button notification-button ${notificationsOpen ? 'selected' : ''}`} aria-label="View notifications" aria-expanded={notificationsOpen} onClick={() => setNotificationsOpen(!notificationsOpen)}><Bell size={19} /><span className="notification-dot" /></button>{notificationsOpen && <div className="notification-popover"><strong>Network notifications</strong><p><span className="status-light" />All 5 trade routes are being monitored.</p><p><TriangleAlert size={15} />{metrics.delayedDeliveries} deliveries need your attention.</p><small>Demo alerts derived from synthetic data.</small></div>}</div><span className="avatar topbar-avatar">ML</span></div>
