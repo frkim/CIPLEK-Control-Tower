@@ -44,6 +44,10 @@ This project follows the relevant [ai-coding-standards](https://github.com/frkim
 
 The demo profile is fictional and grants no permissions. Search input is rendered as text, CSV cells are escaped, and no credentials or real shipment information are included.
 
+### Visual design
+
+The proposed project palette is centralized in `src/index.css`: corporate blue and navy structure the interface, green marks positive outcomes, and orange highlights attention states. These are working project colors, not an official third-party identity. Theme-aware semantic tokens provide higher-contrast text variants in light and dark modes; the palette's medium grey is not used for small text on white. Dashboard and map styles reuse these tokens, with a 16px base, 14-16px body/control text, and larger headings. Narrow layouts reflow cards and controls rather than shrinking text, and wide data tables scroll within their panel.
+
 ### Map attribution
 
 Map geometry is bundled locally from [Natural Earth](https://www.naturalearthdata.com/), public-domain cartographic data. Routes are schematic and must not be used for navigation.
