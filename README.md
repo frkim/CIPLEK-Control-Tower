@@ -1,6 +1,6 @@
-# SIPLEC · Supply Chain Control Tower
+# CIPLEK · Supply Chain Control Tower
 
-A responsive, frontend-only supply chain workspace for SIPLEC, the sourcing and energy procurement organization of E.Leclerc. **All shipments, people, values, events, and forecasts are synthetic.** This is a decision-support demonstration, not a live operational or authentication system.
+A responsive, frontend-only supply chain workspace for CIPLEK. **All shipments, people, values, events, and forecasts are synthetic.** This is a decision-support demonstration, not a live operational or authentication system.
 
 ## Run locally
 
