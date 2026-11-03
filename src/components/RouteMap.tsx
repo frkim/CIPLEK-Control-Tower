@@ -2,6 +2,8 @@ import { useId, useRef, useState } from 'react'
 import type { KeyboardEvent, PointerEvent } from 'react'
 import { ArrowDownLeft, ArrowUpRight, Check, Globe2, Maximize, Minus, Plus, Ship, X } from 'lucide-react'
 import type { Route, ScenarioId } from '../domain/supplyChain'
+import { createTranslator } from '../i18n'
+import type { Language } from '../i18n'
 import worldMap from '../data/world-map.json'
 import './route-map.css'
 
@@ -11,6 +13,7 @@ interface RouteMapProps {
   selectedRoute: string | null
   onSelectRoute: (id: string | null) => void
   activeScenario?: ScenarioId | null
+  language: Language
 }
 
 interface Camera {
@@ -95,7 +98,9 @@ export default function RouteMap({
   selectedRoute,
   onSelectRoute,
   activeScenario = null,
+  language,
 }: RouteMapProps) {
+  const t = createTranslator(language)
   const instanceId = useId().replace(/:/g, '')
   const svgRef = useRef<SVGSVGElement>(null)
   const drag = useRef<{ pointerId: number; x: number; y: number; camera: Camera } | null>(null)
@@ -115,7 +120,7 @@ export default function RouteMap({
   )
   const transform = `translate(${WIDTH / 2 - camera.x * camera.zoom} ${HEIGHT / 2 - camera.y * camera.zoom}) scale(${camera.zoom})`
   const routeDescription = (route: Route) =>
-    `${route.origin} to ${route.destination}, ${route.transitDays} days, ${route.shipmentCount} shipments${disrupted && AFFECTED_ROUTES.has(route.id) ? ', disrupted' : ', operational'}`
+    `${t('{origin} to {destination}, {days} days, {count} shipments', { origin: t(route.origin), destination: route.destination, days: route.transitDays, count: route.shipmentCount })}, ${t(disrupted && AFFECTED_ROUTES.has(route.id) ? 'disrupted' : 'operational')}`
 
   function chooseRoute(route: Route) {
     const nextId = selectedRoute === route.id ? null : route.id
@@ -177,7 +182,7 @@ export default function RouteMap({
       className={`route-map${disrupted ? ' route-map--disrupted' : ''}${isDragging ? ' route-map--dragging' : ''}`}
       data-zoomed={camera.zoom > 1}
       role="region"
-      aria-label="Interactive global supply network"
+      aria-label={t('Interactive global supply network')}
     >
       <svg
         ref={svgRef}
@@ -201,13 +206,13 @@ export default function RouteMap({
           }
         }}
       >
-        <title id={`${instanceId}-title`}>CIPLEK global supply network</title>
+        <title id={`${instanceId}-title`}>{t('CIPLEK global supply network')}</title>
         <desc id={`${instanceId}-description`}>
-          World map showing {routes.length} shipping routes from Asia to France.
-          Select a route or origin port with Enter or Space to filter shipments.
-          Use World or Asia to Europe to change the view, and drag the map when zoomed.
-          {disrupted ? ` ${affectedCount} routes are disrupted in the Suez corridor.` : ''}
-          {scenario ? ` ${scenario.label} alternative is shown alongside the original routes.` : ''}
+          {t('World map showing {count} shipping routes from Asia to France.', { count: routes.length })}{' '}
+          {t('Select a route or origin port with Enter or Space to filter shipments.')}{' '}
+          {t('Use World or Asia to Europe to change the view, and drag the map when zoomed.')}
+          {disrupted ? ` ${t('{count} routes are disrupted in the Suez corridor.', { count: affectedCount })}` : ''}
+          {scenario ? ` ${t('{scenario} alternative is shown alongside the original routes.', { scenario: t(scenario.label) })}` : ''}
         </desc>
         <defs>
           <radialGradient id={`${instanceId}-ocean-glow`} cx="70%" cy="36%" r="65%">
@@ -242,16 +247,15 @@ export default function RouteMap({
             ))}
           </g>
           <g className="route-map__geographic-labels" aria-hidden="true">
-            <text x="252" y="106" className="route-map__continent-label">NORTH AMERICA</text>
-            <text x="365" y="227" className="route-map__continent-label">SOUTH AMERICA</text>
-            <text x="607" y="202" className="route-map__continent-label">AFRICA</text>
-            <text x="862" y="119" className="route-map__country-label">CHINA</text>
-            <text x="798" y="151" className="route-map__country-label">INDIA</text>
-            <text x="968" y="251" className="route-map__continent-label">AUSTRALIA</text>
-            <text x="155" y="205" className="route-map__ocean-label">Pacific Ocean</text>
-            <text x="458" y="199" className="route-map__ocean-label">Atlantic</text>
-            <text x="458" y="213" className="route-map__ocean-label">Ocean</text>
-            <text x="758" y="239" className="route-map__ocean-label">Indian Ocean</text>
+            <text x="252" y="106" className="route-map__continent-label">{t('NORTH AMERICA')}</text>
+            <text x="365" y="227" className="route-map__continent-label">{t('SOUTH AMERICA')}</text>
+            <text x="607" y="202" className="route-map__continent-label">{t('AFRICA')}</text>
+            <text x="862" y="119" className="route-map__country-label">{t('CHINA')}</text>
+            <text x="798" y="151" className="route-map__country-label">{t('INDIA')}</text>
+            <text x="968" y="251" className="route-map__continent-label">{t('AUSTRALIA')}</text>
+            <text x="155" y="205" className="route-map__ocean-label">{t('Pacific Ocean')}</text>
+            <text x="458" y="205" className="route-map__ocean-label">{t('Atlantic Ocean')}</text>
+            <text x="758" y="239" className="route-map__ocean-label">{t('Indian Ocean')}</text>
           </g>
 
           <g className="route-map__routes">
@@ -268,7 +272,7 @@ export default function RouteMap({
                   className={`route-map__route${affected ? ' route-map__route--affected' : ''}${isEmphasized ? ' route-map__route--emphasized' : ''}${isMuted ? ' route-map__route--muted' : ''}${index > 2 ? ' route-map__route--secondary' : ''}`}
                   role="button"
                   tabIndex={0}
-                  aria-label={`Filter shipments: ${routeDescription(route)}`}
+                  aria-label={t('Filter shipments: {route}', { route: routeDescription(route) })}
                   aria-pressed={isSelected}
                   data-map-interactive
                   onClick={() => chooseRoute(route)}
@@ -278,7 +282,7 @@ export default function RouteMap({
                   onFocus={() => setFocusedRoute(route.id)}
                   onBlur={() => setFocusedRoute(null)}
                 >
-                  <title>{routeDescription(route)}. Click to {isSelected ? 'clear filter' : 'filter shipments'}.</title>
+                  <title>{routeDescription(route)}. {t('Click to {action}.', { action: t(isSelected ? 'clear filter' : 'filter shipments') })}</title>
                   <path className="route-map__route-glow" d={d} fill="none" vectorEffect="non-scaling-stroke" />
                   <path
                     id={routeId}
@@ -303,7 +307,7 @@ export default function RouteMap({
           </g>
 
           {activeScenario && (
-            <g className={`route-map__alternatives route-map__alternatives--${scenario?.color}`} aria-label={`${scenario?.label} alternative corridors`}>
+            <g className={`route-map__alternatives route-map__alternatives--${scenario?.color}`} aria-label={t('{scenario} alternative corridors', { scenario: t(scenario?.label ?? '') })}>
               {routes.filter((route) => AFFECTED_ROUTES.has(route.id)).map((route) => (
                 <path
                   key={`alternative-${route.id}`}
@@ -312,23 +316,23 @@ export default function RouteMap({
                   fill="none"
                   vectorEffect="non-scaling-stroke"
                 >
-                  <title>{route.origin} to {route.destination}: {scenario?.label} alternative</title>
+                  <title>{t('{origin} to {destination}: {scenario} alternative', { origin: t(route.origin), destination: route.destination, scenario: t(scenario?.label ?? '') })}</title>
                 </path>
               ))}
               <g className="route-map__scenario-label" transform={activeScenario === 'cape' ? 'translate(645 299)' : activeScenario === 'rail' ? 'translate(728 73)' : 'translate(735 43)'}>
                 <rect x="-76" y="-12" width="152" height="23" rx="11.5" />
-                <text textAnchor="middle" y="3">{scenario?.label}</text>
+                <text textAnchor="middle" y="3">{t(scenario?.label ?? '')}</text>
               </g>
             </g>
           )}
 
           {disrupted && (
-            <g className="route-map__chokepoint" transform="translate(665 149)" aria-label="Suez corridor disrupted">
+            <g className="route-map__chokepoint" transform="translate(665 149)" aria-label={t('Suez corridor disrupted')}>
               <circle r="13" className="route-map__chokepoint-halo" />
               <circle r="7" />
               <text y="3.5" textAnchor="middle">!</text>
               <rect x="-59" y="20" width="118" height="21" rx="5" />
-              <text className="route-map__chokepoint-label" y="34" textAnchor="middle">SUEZ DISRUPTION</text>
+              <text className="route-map__chokepoint-label" y="34" textAnchor="middle">{t('SUEZ DISRUPTION')}</text>
             </g>
           )}
 
@@ -350,7 +354,7 @@ export default function RouteMap({
                   className={`route-map__port${affected ? ' route-map__port--affected' : ''}${selected ? ' route-map__port--selected' : ''}`}
                   role="button"
                   tabIndex={0}
-                  aria-label={`${route.origin} port. ${routeDescription(route)}. ${selected ? 'Clear route filter' : 'Select route'}.`}
+                  aria-label={t('{origin} port. {route}. {action}.', { origin: t(route.origin), route: routeDescription(route), action: t(selected ? 'Clear route filter' : 'Select route') })}
                   aria-pressed={selected}
                   data-map-interactive
                   onClick={() => chooseRoute(route)}
@@ -371,7 +375,7 @@ export default function RouteMap({
                     y={labelY - y}
                     textAnchor={route.id === 'hochi' ? 'end' : 'start'}
                   >
-                    {route.id === 'hochi' ? 'Ho Chi Minh' : route.origin}
+                    {route.id === 'hochi' ? 'Ho Chi Minh' : t(route.origin)}
                   </text>
                 </g>
               )
@@ -388,12 +392,12 @@ export default function RouteMap({
                   className={`route-map__destination${destinationSelected ? ' route-map__destination--selected' : ''}`}
                   role="button"
                   tabIndex={0}
-                  aria-label={`${route.destination}, France, destination port. Show all routes.`}
+                  aria-label={t('{destination}, France, destination port. Show all routes.', { destination: route.destination })}
                   data-map-interactive
                   onClick={() => onSelectRoute(null)}
                   onKeyDown={(event) => keyboardActivate(event, () => onSelectRoute(null))}
                 >
-                  <title>{route.destination}, France · Destination hub · Click to show all routes</title>
+                  <title>{t('{destination}, France · Destination hub · Click to show all routes', { destination: route.destination })}</title>
                   <circle className="route-map__destination-hit" r="13" />
                   <circle className="route-map__destination-pulse" r="8" style={{ animationDelay: `${index * .8}s` }} />
                   <circle className="route-map__destination-ring" r="7" />
@@ -409,11 +413,11 @@ export default function RouteMap({
         </g>
       </svg>
 
-      <div className="route-map__live" title="Local simulation · no external tracking service">
+      <div className="route-map__live" title={t('Local simulation · no external tracking service')}>
         <span className="route-map__live-dot" />
-        LIVE NETWORK
+        {t('LIVE NETWORK')}
       </div>
-      <div className="route-map__view-switch" role="group" aria-label="Map region">
+      <div className="route-map__view-switch" role="group" aria-label={t('Map region')}>
         <button
           type="button"
           className={camera.zoom === 1 ? 'is-active' : ''}
@@ -421,7 +425,7 @@ export default function RouteMap({
           onClick={() => setCamera(OVERVIEW)}
         >
           <Globe2 size={12} aria-hidden="true" />
-          World
+          {t('World')}
         </button>
         <button
           type="button"
@@ -429,16 +433,16 @@ export default function RouteMap({
           aria-pressed={camera.zoom > 1}
           onClick={() => setCamera(CORRIDOR)}
         >
-          Asia <span aria-hidden="true">→</span> Europe
+          {t('Asia')} <span aria-hidden="true">→</span> Europe
         </button>
       </div>
 
       {featuredRoute ? (
         <div className={`route-map__info${featuredAffected ? ' route-map__info--affected' : ''}`} aria-live="polite" aria-atomic="true">
           <div className="route-map__info-eyebrow">
-            <span>{selectedRoute ? 'SELECTED ROUTE' : 'ROUTE SPOTLIGHT'}</span>
+            <span>{t(selectedRoute ? 'SELECTED ROUTE' : 'ROUTE SPOTLIGHT')}</span>
             {selectedRoute ? (
-              <button type="button" aria-label="Clear selected route filter" onClick={() => onSelectRoute(null)}>
+              <button type="button" aria-label={t('Clear selected route filter')} onClick={() => onSelectRoute(null)}>
                 <X size={12} aria-hidden="true" />
               </button>
             ) : <ArrowUpRight size={12} aria-hidden="true" />}
@@ -446,59 +450,59 @@ export default function RouteMap({
           <button type="button" className="route-map__info-route" onClick={() => chooseRoute(featuredRoute)}>
             <span className="route-map__info-icon"><Ship size={16} aria-hidden="true" /></span>
             <span>
-              <strong>{featuredRoute.origin === 'Ho Chi Minh City' ? 'Ho Chi Minh' : featuredRoute.origin} <span aria-hidden="true">→</span> {featuredRoute.destination}</strong>
+              <strong>{featuredRoute.origin === 'Ho Chi Minh City' ? 'Ho Chi Minh' : t(featuredRoute.origin)} <span aria-hidden="true">→</span> {featuredRoute.destination}</strong>
               <span className="route-map__info-subtitle">
-                {featuredAffected ? 'Suez corridor disrupted' : 'Ocean freight · via Suez Canal'}
+                {t(featuredAffected ? 'Suez corridor disrupted' : 'Ocean freight · via Suez Canal')}
               </span>
             </span>
           </button>
           <div className="route-map__info-stats">
-            <span><strong>{featuredRoute.transitDays}<small>d</small></strong> base transit</span>
+            <span><strong>{featuredRoute.transitDays}<small>{t('d')}</small></strong> {t('base transit')}</span>
             <span className="route-map__info-divider" />
-            <span><strong>{featuredRoute.shipmentCount}</strong> shipments</span>
-            <span className={`route-map__info-status${featuredAffected ? ' is-affected' : ''}`} title={featuredAffected ? 'Route disrupted' : 'Route operational'}>
+            <span><strong>{featuredRoute.shipmentCount}</strong> {t('shipments')}</span>
+            <span className={`route-map__info-status${featuredAffected ? ' is-affected' : ''}`} title={t(featuredAffected ? 'Route disrupted' : 'Route operational')}>
               {featuredAffected ? '!' : <Check size={10} aria-hidden="true" />}
             </span>
           </div>
-          {scenario && featuredAffected && <div className={`route-map__info-alternative route-map__info-alternative--${scenario.color}`}><ArrowDownLeft size={11} aria-hidden="true" /> {scenario.label} alternative shown</div>}
+          {scenario && featuredAffected && <div className={`route-map__info-alternative route-map__info-alternative--${scenario.color}`}><ArrowDownLeft size={11} aria-hidden="true" /> {t('{scenario} alternative shown', { scenario: t(scenario.label) })}</div>}
         </div>
       ) : (
-        <div className="route-map__empty">No routes in this view</div>
+        <div className="route-map__empty">{t('No routes in this view')}</div>
       )}
 
       <div className="route-map__bottom-bar">
-        <div className="route-map__zoom" role="group" aria-label="Map zoom controls">
-          <button type="button" aria-label="Zoom in on shipping network" title="Zoom in" disabled={camera.zoom >= 3} onClick={() => changeZoom(.4)}>
+        <div className="route-map__zoom" role="group" aria-label={t('Map zoom controls')}>
+          <button type="button" aria-label={t('Zoom in on shipping network')} title={t('Zoom in')} disabled={camera.zoom >= 3} onClick={() => changeZoom(.4)}>
             <Plus size={15} aria-hidden="true" />
           </button>
           <span />
-          <button type="button" aria-label="Zoom out" title="Zoom out" disabled={camera.zoom <= 1} onClick={() => changeZoom(-.4)}>
+          <button type="button" aria-label={t('Zoom out')} title={t('Zoom out')} disabled={camera.zoom <= 1} onClick={() => changeZoom(-.4)}>
             <Minus size={15} aria-hidden="true" />
           </button>
           <span />
-          <button type="button" aria-label="Reset to full world map" title="Reset view" onClick={() => setCamera(OVERVIEW)}>
+          <button type="button" aria-label={t('Reset to full world map')} title={t('Reset view')} onClick={() => setCamera(OVERVIEW)}>
             <Maximize size={13} aria-hidden="true" />
           </button>
         </div>
         <div className="route-map__map-note">
-          {camera.zoom > 1 ? 'Drag to explore' : 'Click a port to explore'}
+          {t(camera.zoom > 1 ? 'Drag to explore' : 'Click a port to explore')}
           <span>·</span>
           <span title={`${worldMap.source}. ${worldMap.license}`}>Natural Earth</span>
         </div>
-        <div className="route-map__legend" aria-label="Map legend">
-          <span><i className="route-map__legend-line" /> Active route</span>
-          {disrupted && <span><i className="route-map__legend-line route-map__legend-line--affected" /> Disrupted</span>}
-          {scenario && <span><i className={`route-map__legend-line route-map__legend-line--${scenario.color}`} /> Alternative</span>}
-          <span><i className="route-map__legend-port" /> Port</span>
+        <div className="route-map__legend" aria-label={t('Map legend')}>
+          <span><i className="route-map__legend-line" /> {t('Active route')}</span>
+          {disrupted && <span><i className="route-map__legend-line route-map__legend-line--affected" /> {t('Disrupted')}</span>}
+          {scenario && <span><i className={`route-map__legend-line route-map__legend-line--${scenario.color}`} /> {t('Alternative')}</span>}
+          <span><i className="route-map__legend-port" /> {t('Port')}</span>
         </div>
       </div>
 
       <div className="route-map__sr-only" aria-live="polite">
-        {selectedRoute && featuredRoute ? `Filtering shipments for ${featuredRoute.origin} to ${featuredRoute.destination}.` : 'Showing all shipping routes.'}
-        {disrupted ? ` ${affectedCount} original routes disrupted.` : ''}
+        {selectedRoute && featuredRoute ? t('Filtering shipments for {origin} to {destination}.', { origin: t(featuredRoute.origin), destination: featuredRoute.destination }) : t('Showing all shipping routes.')}
+        {disrupted ? ` ${t('{count} original routes disrupted.', { count: affectedCount })}` : ''}
       </div>
       <span className="route-map__sr-only">
-        Map zoom: {Math.round(camera.zoom * 100)} percent.
+        {t('Map zoom: {zoom} percent.', { zoom: Math.round(camera.zoom * 100) })}
       </span>
     </div>
   )

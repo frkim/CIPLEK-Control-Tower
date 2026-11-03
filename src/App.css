@@ -35,6 +35,7 @@
 .breadcrumb { display: flex; align-items: center; gap: 12px; font-size: .875rem; color: var(--text-secondary); }
 .breadcrumb strong { color: var(--heading); font-weight: 600; }
 .topbar-actions { display: flex; align-items: center; gap: 12px; }
+.language-select { min-height: 40px; max-width: 140px; padding: 6px; border: 1px solid var(--control-border); border-radius: 6px; background: var(--card); color: var(--text); font-size: .875rem; }
 .demo-label { display: flex; align-items: center; gap: 6px; font-size: .75rem; color: var(--text-secondary); }
 .demo-label > span, .notification-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--color-brand-orange); }
 .topbar-divider { height: 24px; width: 1px; background: var(--border); }
@@ -62,6 +63,8 @@ h2, h3 { color: var(--heading); }
 .button-outline:not(:disabled):hover { background: var(--primary-pale); border-color: var(--primary); }
 .button-dark { background: var(--button-primary); color: var(--on-brand); border-color: var(--button-primary); }
 .button-dark:hover { background: var(--color-brand-navy); }
+.button-orange { background: var(--color-brand-orange); color: var(--on-orange); border-color: var(--on-orange); }
+.button-orange:hover { background: color-mix(in srgb, var(--color-brand-orange) 90%, var(--card)); }
 .button-teal { background: var(--button-positive); color: var(--on-brand); }
 .button-teal:hover { background: color-mix(in srgb, var(--button-positive) 85%, var(--color-brand-navy)); }
 .button:disabled { opacity: .6; }
@@ -231,7 +234,7 @@ td > small.delay-text { font-size: .75rem; color: var(--warning); margin-top: 4p
   .sidebar-backdrop { display: block; position: fixed; inset: 0; background: color-mix(in srgb, var(--color-brand-navy) 45%, transparent); border: 0; z-index: 35; backdrop-filter: blur(2px); }
   .sidebar-close, .mobile-menu { display: inline-flex; }
   .main-shell { margin-left: 0; }
-  .topbar { padding: 12px 16px; gap: 6px; min-height: 72px; }
+  .topbar { padding: 12px 16px; gap: 6px; min-height: 72px; flex-wrap: wrap; }
   .breadcrumb { gap: 6px; }.breadcrumb > span, .breadcrumb > svg { display: none; }
   .topbar-actions { gap: 4px; }.topbar-divider { display: none; }
   .topbar-avatar { width: 32px; height: 32px; }

@@ -307,8 +307,8 @@ export function getMetrics(shipments: Shipment[]) {
   }
 }
 
-export function formatCurrency(value: number, compact = false): string {
-  return new Intl.NumberFormat('en-US', {
+export function formatCurrency(value: number, compact = false, locale = 'en-US'): string {
+  return new Intl.NumberFormat(locale, {
     style: 'currency',
     currency: 'EUR',
     notation: compact ? 'compact' : 'standard',
@@ -317,8 +317,8 @@ export function formatCurrency(value: number, compact = false): string {
   }).format(value)
 }
 
-export function formatEta(iso: string): string {
-  return new Intl.DateTimeFormat('en-GB', {
+export function formatEta(iso: string, locale = 'en-GB'): string {
+  return new Intl.DateTimeFormat(locale, {
     day: '2-digit',
     month: 'short',
     timeZone: 'UTC',

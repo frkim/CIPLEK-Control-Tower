@@ -1,6 +1,7 @@
 @import "tailwindcss";
 
 :root {
+  color-scheme: light;
   font-family: "Inter", "Segoe UI", -apple-system, BlinkMacSystemFont, sans-serif;
   font-size: 16px;
   line-height: 1.5;
@@ -13,6 +14,7 @@
   --color-brand-blue: #004B87;
   --color-brand-green: #00A651;
   --color-brand-orange: #F58220;
+  --on-orange: #192A38;
   --color-brand-navy: #00345B;
   --color-brand-green-light: #7BCB9B;
   --color-energy: #0077B8;

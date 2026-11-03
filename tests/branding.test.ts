@@ -57,6 +57,7 @@ test('semantic text and buttons meet WCAG AA contrast in both themes', () => {
       ['--heading', '--card'], ['--primary', '--card'], ['--primary', '--primary-pale'],
       ['--positive', '--positive-pale'], ['--warning', '--warning-pale'],
       ['--on-brand', '--button-primary'], ['--on-brand', '--button-positive'],
+      ['--on-orange', '--color-brand-orange'],
     ]
     for (const [foreground, background] of pairs) {
       const ratio = contrast(resolve(foreground), resolve(background))
@@ -73,20 +74,20 @@ test('project metadata and documentation use CIPLEK branding', () => {
   assert.equal(lockfile.name, manifest.name)
   assert.equal(lockfile.packages[''].name, manifest.name)
   const html = read('../index.html')
-  assert.ok(html.includes('<title>CIPLEK · Supply Chain Control Tower</title>'))
-  assert.ok(html.includes('name="description" content="CIPLEK Supply Chain Control Tower.'))
+  assert.ok(html.includes('<title>CIPLEK · Tour de contrôle logistique</title>'))
+  assert.ok(html.includes('name="description" content="Tour de contrôle logistique CIPLEK.'))
   const readme = read('../README.md').replace(/\r\n/g, '\n')
   assert.ok(readme.startsWith('# CIPLEK · Supply Chain Control Tower\n'))
   assert.ok(readme.includes('supply chain workspace for CIPLEK.'))
 })
 
 test('application branding covers navigation, footer, help, map and CSV exports', () => {
-  assert.ok(app.includes('aria-label="CIPLEK Control Tower home"'))
+  assert.ok(app.includes("aria-label={t('CIPLEK Control Tower home')}"))
   assert.ok(app.includes('<span>CIPLEK<span className="brand-subtitle">'))
   assert.ok(app.includes('CIPLEK Control Tower<span className="footer-separator">'))
   assert.ok(app.includes("A decision-making workspace for CIPLEK's supply chain."))
   assert.ok(app.includes("anchor.download = `ciplek-${disrupted ? 'simulation' : 'shipments'}-2026-11.csv`"))
-  assert.ok(read('../src/components/RouteMap.tsx').includes('>CIPLEK global supply network</title>'))
+  assert.ok(read('../src/components/RouteMap.tsx').includes(">{t('CIPLEK global supply network')}</title>"))
 })
 
 test('theme persistence uses the same CIPLEK key in the app and bootstrap', () => {
