@@ -4,7 +4,10 @@ A responsive, frontend-only supply chain workspace for CIPLEK. **All shipments, 
 
 ## Run locally
 
-Use Node.js 24 LTS (Node 22.23 is also compatible) and npm.
+Use Node.js 24 LTS and its bundled npm.
+Run `nvm use` to select the same version as CI. The `.npmrc` registry-prefix
+setting downloads the existing lockfile's packages from public npm without changing
+their versions or integrity hashes.
 
 ```sh
 npm ci
@@ -21,6 +24,56 @@ npm run preview # Serve the production bundle locally
 ```
 
 Deploy the generated `dist/` directory to a static web host. Configure HTTPS and appropriate security headers on that host; the application does not implement a server.
+
+## CI/CD on Azure
+
+The [CI/CD workflow](.github/workflows/ci-cd.yml) runs lint, tests, a production
+build, and Bicep lint/build on pull requests, pushes to `main`, and manual runs.
+Only successful runs on `main` deploy, using the exact checked build artifact.
+Pull requests never receive Azure credentials or deploy. Production deployments
+are serialized rather than cancelled midway.
+
+The host is **Azure Static Web Apps, Free tier**, with managed HTTPS, SPA fallback,
+and security headers in `public/staticwebapp.config.json`. Bicep manages the site;
+no backend, paid App Service plan, or additional stored deployment token is needed.
+
+### One-time setup
+
+1. Create a resource group in the target Azure subscription (for example
+   `rg-ciplek-prod-westeurope`). Register the `Microsoft.Web` resource provider if
+   it is not already registered.
+2. Give the deployment service principal **Contributor on that resource group**,
+   not the whole subscription. This permits ARM deployment and retrieving the
+   Static Web Apps deployment token; the app itself has no Azure identity or data access.
+3. Add the Actions secret **`AZURE_CREDENTIALS`**, containing the Azure login JSON
+   fields `clientId`, `clientSecret`, `subscriptionId`, and `tenantId`. Never commit
+   this JSON. This is the issue-requested exception to the linked standards'
+   OIDC preference; migrate to federated identity when that requirement changes.
+4. Configure these Actions variables in the repository or `production` environment:
+
+   | Variable | Value |
+   | --- | --- |
+   | `AZURE_RESOURCE_GROUP` | The existing resource group name |
+   | `AZURE_STATIC_WEB_APP_NAME` | The site name, for example `swa-ciplek-prod` |
+   | `AZURE_LOCATION` | Optional supported Static Web Apps region; defaults to `westeurope` |
+
+5. Create the GitHub **`production` environment**, require reviewers, and restrict
+   deployment branches to `main`. These protections must be configured in GitHub;
+   naming an environment in workflow YAML does not enable them.
+6. Merge the workflow into `main`, then use **Actions → CI/CD → Run workflow → main**
+   (or `gh workflow run ci-cd.yml --ref main`).
+
+Deployment validates ARM parameters, prints a Bicep `what-if`, provisions the
+site, and retrieves a runtime-only masked deployment token via `AZURE_CREDENTIALS`.
+The deploy action skips rebuilding. The final step fetches the public HTTPS page,
+JavaScript, CSS, theme script, and favicon and compares them with the build artifact;
+a failed or stale deployment fails the job. The verified URL appears in the run
+summary and environment. Open it and exercise navigation, theme switching, shipment
+filtering, and scenario simulation for an interactive acceptance check.
+
+Azure credentials are unavailable during local validation. A passing local build
+does not establish that an Azure deployment has succeeded; check the actual Actions
+run and its live verification step after configuring the above.
 
 ## Explore
 
