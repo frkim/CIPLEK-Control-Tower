@@ -1,0 +1,54 @@
+@import "tailwindcss";
+
+:root {
+  font-family: "Inter", "Segoe UI", -apple-system, BlinkMacSystemFont, sans-serif;
+  color: #23332f;
+  background: #f5f7f6;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  --background: #f5f7f6;
+  --card: #ffffff;
+  --text: #23332f;
+  --text-secondary: #61716b;
+  --text-muted: #68756c;
+  --border: #e8ece9;
+  --subtle: #f8faf9;
+  --teal: #087c6a;
+  --teal-pale: #e9f5ef;
+  --chart-grid: #edf0ed;
+}
+
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  --background: #111b1b;
+  --card: #192525;
+  --text: #e3ebe6;
+  --text-secondary: #abb9b0;
+  --text-muted: #94a69e;
+  --border: #2b3a36;
+  --subtle: #1d2c28;
+  --teal: #6ed6b9;
+  --teal-pale: #1e3c33;
+  --chart-grid: #2b3a36;
+}
+
+* { box-sizing: border-box; }
+body { margin: 0; min-width: 320px; }
+button, input, select { font: inherit; }
+button, a, input, select { -webkit-tap-highlight-color: transparent; }
+button { cursor: pointer; }
+button:disabled { cursor: not-allowed; }
+a { color: inherit; text-decoration: none; }
+button, input, select { outline-offset: 4px; }
+:focus-visible { outline: 2px solid #159c88; outline-offset: 4px; }
+button { color: inherit; }
+button, select { touch-action: manipulation; }
+::selection { color: #064e42; background: #b7ecda; }
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+.skip-link { position: fixed; top: -60px; left: 20px; z-index: 100; padding: 12px; background: var(--card); border: 2px solid var(--teal); border-radius: 6px; }
+.skip-link:focus { top: 10px; }
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
+}
