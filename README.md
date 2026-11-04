@@ -42,6 +42,9 @@ are serialized rather than cancelled midway.
 
 The checked-in workflow targets **Azure Static Web Apps, Free tier**, with managed
 HTTPS, SPA fallback, and security headers in `public/staticwebapp.config.json`.
+Missing static assets retain HTTP 404 and use `public/404.html` via a response
+override, so Azure applies the configured security headers instead of serving
+its default error page without them.
 Its presence does not establish that a site is online. Before provisioning, confirm
 that the target subscription permits a supported Static Web Apps region. Bicep
 manages the site; no backend, paid App Service plan, or additional stored
