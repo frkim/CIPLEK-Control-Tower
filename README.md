@@ -49,9 +49,9 @@ deployment token is needed.
 
 ### One-time setup
 
-1. Create a resource group in the target Azure subscription (for example
-   `rg-ciplek-prod-westeurope`). Register the `Microsoft.Web` resource provider if
-   it is not already registered.
+1. Prefer one-time manual creation of `rg-ciplek-towercontrol` in `eastus2`, in
+   the **same `subscriptionId` as `AZURE_CREDENTIALS`** (see troubleshooting below).
+   Register the `Microsoft.Web` resource provider if it is not already registered.
 2. Give the deployment service principal **Contributor on that resource group**,
    not the whole subscription. This permits ARM deployment and retrieving the
    Static Web Apps deployment token; the app itself has no Azure identity or data access.
@@ -63,9 +63,13 @@ deployment token is needed.
 
    | Variable | Value |
    | --- | --- |
-   | `AZURE_RESOURCE_GROUP` | The existing resource group name |
-   | `AZURE_STATIC_WEB_APP_NAME` | The site name, for example `swa-ciplek-prod` |
-   | `AZURE_LOCATION` | Optional supported Static Web Apps region; defaults to `westeurope` |
+   | `AZURE_RESOURCE_GROUP` | `rg-ciplek-towercontrol` |
+   | `AZURE_STATIC_WEB_APP_NAME` | `ciplektowercontrol` |
+   | `AZURE_LOCATION` | `eastus2` |
+
+   These are the target deployment values. The workflow default remains
+   `westeurope` when `AZURE_LOCATION` is unset. Actions variables configure the
+   workflow; they do **not** create Azure resources.
 
 5. Create the GitHub **`production` environment**, require reviewers, and restrict
    deployment branches to `main`. These protections must be configured in GitHub;
@@ -90,9 +94,41 @@ production environment may show a deployment URL even if verification fails.
 Open the verified URL and exercise navigation, theme switching, shipment
 filtering, and scenario simulation for an interactive acceptance check.
 
-Azure credentials are unavailable during local validation. A passing local build
+The Actions `AZURE_CREDENTIALS` secret is unavailable during local validation. A passing local build
 does not establish that an Azure deployment has succeeded; check the actual Actions
 run and its live verification step after configuring the above.
+
+### ResourceGroupNotFound after Azure login
+
+Successful login does not prove that `rg-ciplek-towercontrol` exists in the selected
+subscription. A missing group **or the wrong subscription** can cause ARM group
+validation to fail with `ResourceGroupNotFound`.
+
+The preferred least-privilege fix is for an authorized operator to create the group
+once, selecting the `subscriptionId` from `AZURE_CREDENTIALS`:
+
+```sh
+az account set --subscription "<subscriptionId-from-AZURE_CREDENTIALS>"
+az account show --output table
+az group create --name rg-ciplek-towercontrol --location eastus2
+```
+
+Ensure the deployment identity has **resource-group-scoped Contributor** on the
+created group. Then retry **Actions → CI/CD → Run workflow → main**
+(or `gh workflow run ci-cd.yml --ref main`).
+
+Optional automatic first-run group bootstrap requires the deployment identity to
+already have subscription-scope permission for
+`Microsoft.Resources/subscriptions/resourceGroups/write`. Resource-group-scoped
+Contributor does **not** provide this permission to create a missing group.
+The workflow's bootstrap step runs immediately after Azure login and before ARM validation:
+it logs `az account show`, queries `az group exists`, and only when the group is
+missing runs
+`az group create --name "$AZURE_RESOURCE_GROUP" --location "$AZURE_LOCATION" --output none`.
+Existing groups are preserved. If creation is unauthorized, the step fails
+explicitly and explains the manual setup rather than continuing to ARM validation.
+It does not grant RBAC automatically; subscription-wide Contributor is not needed
+or recommended for this setup.
 
 ## Explore
 
