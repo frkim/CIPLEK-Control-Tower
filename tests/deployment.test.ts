@@ -14,6 +14,16 @@ test('Azure serves SPA navigation without replacing missing static assets with H
   assert.ok(config.navigationFallback.exclude.includes('/*.{js,css,svg,json,ico}'))
 })
 
+test('Azure serves a custom 404 document with global security headers and the original error status', () => {
+  assert.deepEqual(config.responseOverrides['404'], { rewrite: '/404.html' })
+  const notFound = readFileSync(new URL('../public/404.html', import.meta.url), 'utf8')
+  assert.match(notFound, /<!doctype html>/i)
+  assert.match(notFound, /<html lang="fr">/)
+  assert.match(notFound, /Page introuvable/)
+  assert.doesNotMatch(notFound, /<script\b|id="root"/i)
+  assert.notEqual(notFound, readFileSync(new URL('../index.html', import.meta.url), 'utf8'))
+})
+
 test('Azure hosting enforces HTTPS and browser security headers', () => {
   const headers = config.globalHeaders
   assert.equal(headers['Strict-Transport-Security'], 'max-age=31536000')
