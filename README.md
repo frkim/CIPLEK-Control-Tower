@@ -145,6 +145,13 @@ The fixed November 2026 portfolio contains 24 shipments on five routes. A Suez d
 
 ## Architecture and standards
 
+![CIPLEK architecture: browser-only React simulation with bundled synthetic data and local preferences; GitHub Actions builds, provisions and deploys the static site to Azure Static Web Apps.](docs/assets/ciplek-architecture.svg)
+
+[Editable Excalidraw source](docs/assets/ciplek-architecture.excalidraw) ·
+[Cloud drawing](https://excalidraw.core.microsoft/drawing/cb683877-08d8-413f-b9f6-15cb7633411e).
+The diagram distinguishes the frontend-only simulation from the configured deployment
+pipeline; it is not proof that Azure resources exist or that a deployment is live.
+
 Built with React, strict TypeScript, Vite, Tailwind CSS, Lucide icons, and Recharts. The pure data/simulation layer is in `src/domain/`, the offline map is in `src/components/`, and dashboard orchestration lives in `src/App.tsx`. Local state is sufficient for this small, backend-free demonstration; reloading resets simulations and filters.
 
 This project follows the relevant [ai-coding-standards](https://github.com/frkim/ai-coding-standards/): semantic accessible controls, keyboard interaction, reduced-motion support, persistent OS-aware themes, searchable/sortable/filterable tables, strict typing, lockfile installs, dependency review, and tested domain behavior.
