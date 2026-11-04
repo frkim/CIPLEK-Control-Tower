@@ -25,6 +25,10 @@ jobs:
         with:
           node-version-file: .nvmrc
           cache: npm
+      - name: Test npm feed verification
+        run: node --experimental-strip-types --test tests/npm-feed.test.ts
+      - name: Verify npm feed
+        run: node scripts/verify-npm-feed.mjs
       - run: npm ci
       - run: npm run lint
       - run: npm test
@@ -65,6 +69,9 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .nvmrc
       - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
           name: site
@@ -112,21 +119,9 @@ jobs:
           skip_app_build: true
           skip_api_build: true
           production_branch: main
-      - name: Verify live HTML and assets
+      - name: Verify live application
         env:
           APP_URL: ${{ steps.deploy.outputs.static_web_app_url }}
         run: |
-          [[ "$APP_URL" == https://* ]]
-          url="${APP_URL%/}"
-          curl --fail --silent --show-error --retry 12 --retry-all-errors \
-            --retry-delay 5 --max-time 30 "$url/" --output "$RUNNER_TEMP/live.html"
-          cmp dist/index.html "$RUNNER_TEMP/live.html"
-          {
-            printf '%s\n' /theme.js /favicon.svg
-            grep -oE '/assets/[^"]+\.(js|css)' dist/index.html
-          } | while IFS= read -r asset; do
-            curl --fail --silent --show-error --retry 12 --retry-all-errors \
-              --retry-delay 5 --max-time 30 "$url$asset" --output "$RUNNER_TEMP/live-asset"
-            cmp "dist$asset" "$RUNNER_TEMP/live-asset"
-          done
-          echo "Deployed and verified: $url" >> "$GITHUB_STEP_SUMMARY"
+          node scripts/verify-live-deployment.mjs
+          printf 'Deployed and verified: %s\n' "${APP_URL%/}" >> "$GITHUB_STEP_SUMMARY"
