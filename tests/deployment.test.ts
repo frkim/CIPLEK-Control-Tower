@@ -27,17 +27,23 @@ test('Azure hosting enforces HTTPS and browser security headers', () => {
 })
 
 test('only checked main builds can reach the protected Azure deployment', () => {
-  assert.match(workflow, /if: github\.event_name != 'pull_request' && github\.ref == 'refs\/heads\/main'/)
-  assert.match(workflow, /needs: \[build, infrastructure\]/)
-  assert.match(workflow, /environment:\n\s+name: production/)
-  assert.doesNotMatch(workflow, /pull_request_target/)
-  const [checks, deployment] = workflow.split('\n  deploy:')
-  assert.ok(!checks.includes('secrets.'))
-  assert.ok(deployment.includes('creds: ${{ secrets.AZURE_CREDENTIALS }}'))
-  assert.ok(deployment.includes('echo "::add-mask::$token"'))
-  assert.ok(deployment.includes('skip_app_build: true'))
-  assert.ok(deployment.includes('cmp dist/index.html'))
-  assert.ok(deployment.includes('cmp "dist$asset"'))
+  for (const lineEnding of ['\n', '\r\n']) {
+    const source = workflow.replace(/\r?\n/g, lineEnding)
+    assert.match(source, /if: github\.event_name != 'pull_request' && github\.ref == 'refs\/heads\/main'/)
+    assert.match(source, /needs: \[build, infrastructure\]/)
+    assert.match(source, /environment:\r?\n\s+name: production/)
+    assert.doesNotMatch(source, /pull_request_target/)
+    const [checks, deployment] = source.split(/\r?\n  deploy:/)
+    assert.ok(deployment, 'deployment job is present')
+    assert.ok(!checks.includes('secrets.'))
+    assert.ok(deployment.includes('creds: ${{ secrets.AZURE_CREDENTIALS }}'))
+    assert.ok(deployment.includes('echo "::add-mask::$token"'))
+    assert.ok(deployment.includes('skip_app_build: true'))
+    assert.ok(deployment.includes('node-version-file: .nvmrc'))
+    assert.ok(deployment.includes('APP_URL: ${{ steps.deploy.outputs.static_web_app_url }}'))
+    assert.ok(deployment.includes('node scripts/verify-live-deployment.mjs'))
+    assert.ok(deployment.includes('Deployed and verified: %s'))
+  }
 })
 
 test('workflow actions are pinned and CI uses the shared Node runtime and lockfile', () => {

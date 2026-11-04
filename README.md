@@ -5,11 +5,17 @@ A responsive, frontend-only supply chain workspace for CIPLEK. **All shipments, 
 ## Run locally
 
 Use Node.js 24 LTS and its bundled npm.
-Run `nvm use` to select the same version as CI. The `.npmrc` registry-prefix
-setting downloads the existing lockfile's packages from public npm without changing
-their versions or integrity hashes.
+Run `nvm use` to select the same version as CI. The repository `.npmrc` selects
+the [Microsoft-protected npm feed](https://packagefeedproxy.microsoft.io/npm/)
+and prevents npm from rewriting locked package hosts. Before installing, verify
+the effective default and scoped registries, npm settings, and lockfile sources;
+the check runs locally without downloading packages. It requires the version 3
+`package-lock.json` and rejects an `npm-shrinkwrap.json` that would override it.
+If a package is unavailable on the protected feed, use the approved CFS
+exception process rather than switching registries.
 
 ```sh
+node scripts/verify-npm-feed.mjs
 npm ci
 npm run dev
 ```
@@ -29,13 +35,17 @@ Deploy the generated `dist/` directory to a static web host. Configure HTTPS and
 
 The [CI/CD workflow](.github/workflows/ci-cd.yml) runs lint, tests, a production
 build, and Bicep lint/build on pull requests, pushes to `main`, and manual runs.
+The build checks the npm feed configuration and lockfile sources before `npm ci`.
 Only successful runs on `main` deploy, using the exact checked build artifact.
 Pull requests never receive Azure credentials or deploy. Production deployments
 are serialized rather than cancelled midway.
 
-The host is **Azure Static Web Apps, Free tier**, with managed HTTPS, SPA fallback,
-and security headers in `public/staticwebapp.config.json`. Bicep manages the site;
-no backend, paid App Service plan, or additional stored deployment token is needed.
+The checked-in workflow targets **Azure Static Web Apps, Free tier**, with managed
+HTTPS, SPA fallback, and security headers in `public/staticwebapp.config.json`.
+Its presence does not establish that a site is online. Before provisioning, confirm
+that the target subscription permits a supported Static Web Apps region. Bicep
+manages the site; no backend, paid App Service plan, or additional stored
+deployment token is needed.
 
 ### One-time setup
 
@@ -66,9 +76,18 @@ no backend, paid App Service plan, or additional stored deployment token is need
 Deployment validates ARM parameters, prints a Bicep `what-if`, provisions the
 site, and retrieves a runtime-only masked deployment token via `AZURE_CREDENTIALS`.
 The deploy action skips rebuilding. The final step fetches the public HTTPS page,
-JavaScript, CSS, theme script, and favicon and compares them with the build artifact;
-a failed or stale deployment fails the job. The verified URL appears in the run
-summary and environment. Open it and exercise navigation, theme switching, shipment
+all bundled `assets/` files, the theme script, and the favicon and compares them
+with the build artifact. It also checks configured security headers, content
+types, SPA navigation fallback, missing-asset 404s, and HTTP-to-HTTPS redirects
+for every checked URL. It retries transient network errors and mismatched
+content, content types, or security headers during rollout; a persistent
+failure or stale deployment fails the job. The HTTP probes use the same
+hostname and paths as the HTTPS requests. For hosts with
+different nonstandard HTTP and HTTPS ports, set `APP_HTTP_URL` when running the
+verifier manually; it must use the same hostname and base path as `APP_URL`.
+After a successful check, the verified URL appears in the run summary. The
+production environment may show a deployment URL even if verification fails.
+Open the verified URL and exercise navigation, theme switching, shipment
 filtering, and scenario simulation for an interactive acceptance check.
 
 Azure credentials are unavailable during local validation. A passing local build
