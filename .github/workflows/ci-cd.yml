@@ -84,6 +84,27 @@ jobs:
         uses: azure/login@a641126d1b8aa4d1fa005f4f92df94a3a4c4c906 # v3.1.0
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
+      - name: Ensure resource group exists
+        shell: bash
+        run: |
+          az account show --query '{subscription:name,subscriptionId:id}' --output table
+          group_exists="$(az group exists --name "$AZURE_RESOURCE_GROUP" --output tsv)"
+          case "$group_exists" in
+            true) ;;
+            false)
+              az group create \
+                --name "$AZURE_RESOURCE_GROUP" \
+                --location "$AZURE_LOCATION" \
+                --output none || {
+                  echo "::error::Cannot create resource group '$AZURE_RESOURCE_GROUP'. Pre-create it in the subscription used by AZURE_CREDENTIALS and grant the deployment identity Contributor on that group, or use an identity already authorized to create resource groups."
+                  exit 1
+                }
+              ;;
+            *)
+              echo "::error::Unexpected resource group existence result: '$group_exists'."
+              exit 1
+              ;;
+          esac
       - name: Validate, preview, and deploy infrastructure
         run: |
           parameters=("siteName=$AZURE_STATIC_WEB_APP_NAME" "location=$AZURE_LOCATION")
